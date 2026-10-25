@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fjython.github.io/sitemap.xml
