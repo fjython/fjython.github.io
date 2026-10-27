@@ -16,8 +16,9 @@
       "slug": "hash-generator",
       "title": "SHA-256 / MD5 Hash Generator",
       "keyword": "sha256 hash generator online",
-      "status": "todo",
-      "blurb": "Hash text with Web Crypto (SHA-256) and a simple MD5 fallback note."
+      "status": "done",
+      "blurb": "Hash text with Web Crypto (SHA-256) and a simple MD5 fallback note.",
+      "shipped": "2026-10-27"
     },
     {
       "id": 13,
