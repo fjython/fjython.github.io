@@ -23,7 +23,7 @@
     <div class="ad-slot" aria-hidden="true">Advertisement placeholder</div>
     <div class="panel">
       <label for="input">Input</label>
-      <textarea id="input" rows="6" placeholder="Text to encode, or a percent-encoded query string to decode…"></textarea>
+      <textarea id="input" rows="6" spellcheck="false" placeholder="Text to encode, or a percent-encoded query string to decode…"></textarea>
       <div class="row">
         <button type="button" class="btn" id="enc">Encode</button>
         <button type="button" class="btn-secondary btn" id="dec">Decode</button>
@@ -74,11 +74,34 @@
     }
   };
 
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return;
+      } catch (e) { /* fall back when the clipboard permission is denied */ }
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (!ok) throw new Error('Copy is not available in this browser');
+  }
+
   document.getElementById('copy').onclick = async () => {
     const t = out.textContent;
     if (!t || t === '—') return;
     try {
-      await navigator.clipboard.writeText(t);
+      await copyText(t);
+      err.textContent = '';
       toast.textContent = 'Copied!';
       setTimeout(() => { toast.textContent = ''; }, 1500);
     } catch (e) {
