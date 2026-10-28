@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>URL Encode Decode Online — Free URL Encoder &amp; Decoder</title>
+  <meta name="description" content="Free url encode decode online tool. Encode text with encodeURIComponent or decode query strings in your browser. Plus signs become spaces on decode. Nothing is uploaded.">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"What does this URL encoder do?","acceptedAnswer":{"@type":"Answer","text":"Encode uses encodeURIComponent, which percent-encodes characters that are not safe in a query component, including spaces, &, =, ?, /, and non-ASCII text as UTF-8. Decode reverses those %HH sequences."}},
+    {"@type":"Question","name":"Is my text uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. Encoding and decoding run locally with JavaScript in your browser. Nothing is sent to a server."}},
+    {"@type":"Question","name":"Why does a plus sign become a space when I decode?","acceptedAnswer":{"@type":"Answer","text":"Query strings from HTML forms (application/x-www-form-urlencoded) use + for a space. Decode treats each + as a space before decodeURIComponent. A literal plus that was encoded as %2B stays a plus. Invalid sequences such as %ZZ show an error instead of a partial result."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header"><div class="inner"><a class="logo" href="../index.html">Micro<span>Tools</span></a><a class="nav-home" href="../index.html">All tools</a></div></header>
+  <main>
+    <nav class="breadcrumb"><a href="../index.html">Home</a> / URL Encode / Decode</nav>
+    <h1>URL Encode / Decode</h1>
+    <p class="lead">Encode text with encodeURIComponent or decode a query string. Plus signs are treated as spaces when decoding. Everything runs in your browser.</p>
+    <div class="ad-slot" aria-hidden="true">Advertisement placeholder</div>
+    <div class="panel">
+      <label for="input">Input</label>
+      <textarea id="input" rows="6" placeholder="Text to encode, or a percent-encoded query string to decode…"></textarea>
+      <div class="row">
+        <button type="button" class="btn" id="enc">Encode</button>
+        <button type="button" class="btn-secondary btn" id="dec">Decode</button>
+        <button type="button" class="btn-secondary btn" id="copy">Copy</button>
+        <button type="button" class="btn-secondary btn" id="clear">Clear</button>
+        <span class="toast" id="toast"></span>
+      </div>
+      <p id="err" style="color:#dc2626;font-size:.9rem;min-height:1.2em;margin:.5rem 0 0"></p>
+      <label>Output</label>
+      <div class="output-box" id="out" style="min-height:3rem;word-break:break-all;font-family:var(--mono)">—</div>
+    </div>
+    <section class="faq">
+      <h2>FAQ</h2>
+      <details open><summary>What does this URL encoder do?</summary><p>Encode uses encodeURIComponent, which percent-encodes characters that are not safe in a query component, including spaces, &amp;, =, ?, /, and non-ASCII text as UTF-8. Decode reverses those %HH sequences.</p></details>
+      <details><summary>Is my text uploaded to a server?</summary><p>No. Encoding and decoding run locally with JavaScript in your browser. Nothing is sent to a server.</p></details>
+      <details><summary>Why does a plus sign become a space when I decode?</summary><p>Query strings from HTML forms (application/x-www-form-urlencoded) use + for a space. Decode treats each + as a space before decodeURIComponent. A literal plus that was encoded as %2B stays a plus. Invalid sequences such as %ZZ show an error instead of a partial result.</p></details>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="inner"><div class="ad-slot" aria-hidden="true">Footer ad placeholder</div><p>© <span class="y"></span> MicroTools</p></div></footer>
+  <script>
+  document.querySelectorAll('.y').forEach(el => el.textContent = new Date().getFullYear());
+  const input = document.getElementById('input');
+  const out = document.getElementById('out');
+  const err = document.getElementById('err');
+  const toast = document.getElementById('toast');
+
+  function show(text) {
+    err.textContent = '';
+    out.textContent = text;
+  }
+
+  document.getElementById('enc').onclick = () => {
+    try {
+      show(encodeURIComponent(input.value));
+    } catch (e) {
+      err.textContent = 'Could not encode: ' + (e && e.message ? e.message : String(e));
+      out.textContent = '—';
+    }
+  };
+
+  document.getElementById('dec').onclick = () => {
+    const raw = input.value.replace(/\+/g, ' ');
+    try {
+      show(decodeURIComponent(raw));
+    } catch (e) {
+      err.textContent = 'Invalid URL encoding: ' + (e && e.message ? e.message : 'malformed escape sequence');
+      out.textContent = '—';
+    }
+  };
+
+  document.getElementById('copy').onclick = async () => {
+    const t = out.textContent;
+    if (!t || t === '—') return;
+    try {
+      await navigator.clipboard.writeText(t);
+      toast.textContent = 'Copied!';
+      setTimeout(() => { toast.textContent = ''; }, 1500);
+    } catch (e) {
+      err.textContent = 'Could not copy: ' + (e && e.message ? e.message : String(e));
+    }
+  };
+
+  document.getElementById('clear').onclick = () => {
+    input.value = '';
+    out.textContent = '—';
+    err.textContent = '';
+    toast.textContent = '';
+  };
+  </script>
+</body>
+</html>

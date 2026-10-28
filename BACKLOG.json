@@ -25,8 +25,9 @@
       "slug": "url-encoder",
       "title": "URL Encode / Decode",
       "keyword": "url encode decode online",
-      "status": "todo",
-      "blurb": "encodeURIComponent and decode for query strings."
+      "status": "done",
+      "blurb": "encodeURIComponent and decode for query strings.",
+      "shipped": "2026-10-28"
     },
     {
       "id": 14,
