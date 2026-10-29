@@ -34,8 +34,9 @@
       "slug": "html-entity",
       "title": "HTML Entity Encoder",
       "keyword": "html entity encoder online",
-      "status": "todo",
-      "blurb": "Escape and unescape HTML entities in text."
+      "status": "done",
+      "blurb": "Escape and unescape HTML entities in text.",
+      "shipped": "2026-10-29"
     },
     {
       "id": 15,

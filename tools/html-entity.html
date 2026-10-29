@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML Entity Encoder Online — Escape and Unescape HTML Entities</title>
+  <meta name="description" content="Free html entity encoder online. Escape &amp; &lt; &gt; &quot; &#39; and other special characters to named or numeric HTML entities, or unescape them back to text. Runs locally in your browser.">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"What does this HTML entity encoder do?","acceptedAnswer":{"@type":"Answer","text":"Escape turns &, <, >, \", ', and other special characters into named entities such as &amp; and &nbsp;, or numeric references such as &#233;. Unescape turns those entities back into characters."}},
+    {"@type":"Question","name":"Is my text uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. Escaping and unescaping run locally with JavaScript in your browser. Nothing is sent to a server."}},
+    {"@type":"Question","name":"Which entities can this tool decode?","acceptedAnswer":{"@type":"Answer","text":"It decodes common named entities such as &amp;, &lt;, &gt;, &quot;, &apos;, and &nbsp;, plus decimal references like &#169; and hexadecimal references like &#xA9;. Unknown entity names are left unchanged. An invalid numeric reference shows an error instead of a partial result."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header"><div class="inner"><a class="logo" href="../index.html">Micro<span>Tools</span></a><a class="nav-home" href="../index.html">All tools</a></div></header>
+  <main>
+    <nav class="breadcrumb"><a href="../index.html">Home</a> / HTML Entity Encoder</nav>
+    <h1>HTML Entity Encoder</h1>
+    <p class="lead">Escape text into HTML entities or unescape entities back into characters. Markup characters and common symbols use named entities; other non-ASCII characters use numeric references. Everything runs in your browser.</p>
+    <div class="ad-slot" aria-hidden="true">Advertisement placeholder</div>
+    <div class="panel">
+      <label for="input">Input</label>
+      <textarea id="input" rows="6" spellcheck="false" placeholder="Text to escape, or HTML entities to unescape…"></textarea>
+      <div class="row">
+        <button type="button" class="btn" id="escape">Escape</button>
+        <button type="button" class="btn-secondary btn" id="unescape">Unescape</button>
+        <button type="button" class="btn-secondary btn" id="copy">Copy</button>
+        <button type="button" class="btn-secondary btn" id="clear">Clear</button>
+        <span class="toast" id="toast"></span>
+      </div>
+      <p id="err" style="color:#dc2626;font-size:.9rem;min-height:1.2em;margin:.5rem 0 0"></p>
+      <label>Output</label>
+      <div class="output-box" id="out" style="min-height:3rem;word-break:break-all;font-family:var(--mono)">—</div>
+    </div>
+    <section class="faq">
+      <h2>FAQ</h2>
+      <details open><summary>What does this HTML entity encoder do?</summary><p>Escape turns &amp;, &lt;, &gt;, &quot;, &#39;, and other special characters into named entities such as &amp;amp; and &amp;nbsp;, or numeric references such as &amp;#233;. Unescape turns those entities back into characters.</p></details>
+      <details><summary>Is my text uploaded to a server?</summary><p>No. Escaping and unescaping run locally with JavaScript in your browser. Nothing is sent to a server.</p></details>
+      <details><summary>Which entities can this tool decode?</summary><p>It decodes common named entities such as &amp;amp;, &amp;lt;, &amp;gt;, &amp;quot;, &amp;apos;, and &amp;nbsp;, plus decimal references like &amp;#169; and hexadecimal references like &amp;#xA9;. Unknown entity names are left unchanged. An invalid numeric reference shows an error instead of a partial result.</p></details>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="inner"><div class="ad-slot" aria-hidden="true">Footer ad placeholder</div><p>© <span class="y"></span> MicroTools</p></div></footer>
+  <script>
+  document.querySelectorAll('.y').forEach(el => el.textContent = new Date().getFullYear());
+  const input = document.getElementById('input');
+  const out = document.getElementById('out');
+  const err = document.getElementById('err');
+  const toast = document.getElementById('toast');
+
+  const NAMED = {
+    amp: '&', lt: '<', gt: '>', quot: '"', apos: "'",
+    nbsp: '\u00A0', iexcl: '\u00A1', cent: '\u00A2', pound: '\u00A3', curren: '\u00A4', yen: '\u00A5', brvbar: '\u00A6', sect: '\u00A7',
+    uml: '\u00A8', copy: '\u00A9', ordf: '\u00AA', laquo: '\u00AB', not: '\u00AC', shy: '\u00AD', reg: '\u00AE', macr: '\u00AF',
+    deg: '\u00B0', plusmn: '\u00B1', sup2: '\u00B2', sup3: '\u00B3', acute: '\u00B4', micro: '\u00B5', para: '\u00B6', middot: '\u00B7',
+    cedil: '\u00B8', sup1: '\u00B9', ordm: '\u00BA', raquo: '\u00BB', frac14: '\u00BC', frac12: '\u00BD', frac34: '\u00BE', iquest: '\u00BF',
+    Agrave: '\u00C0', Aacute: '\u00C1', Acirc: '\u00C2', Atilde: '\u00C3', Auml: '\u00C4', Aring: '\u00C5', AElig: '\u00C6', Ccedil: '\u00C7',
+    Egrave: '\u00C8', Eacute: '\u00C9', Ecirc: '\u00CA', Euml: '\u00CB', Igrave: '\u00CC', Iacute: '\u00CD', Icirc: '\u00CE', Iuml: '\u00CF',
+    ETH: '\u00D0', Ntilde: '\u00D1', Ograve: '\u00D2', Oacute: '\u00D3', Ocirc: '\u00D4', Otilde: '\u00D5', Ouml: '\u00D6', times: '\u00D7',
+    Oslash: '\u00D8', Ugrave: '\u00D9', Uacute: '\u00DA', Ucirc: '\u00DB', Uuml: '\u00DC', Yacute: '\u00DD', THORN: '\u00DE', szlig: '\u00DF',
+    agrave: '\u00E0', aacute: '\u00E1', acirc: '\u00E2', atilde: '\u00E3', auml: '\u00E4', aring: '\u00E5', aelig: '\u00E6', ccedil: '\u00E7',
+    egrave: '\u00E8', eacute: '\u00E9', ecirc: '\u00EA', euml: '\u00EB', igrave: '\u00EC', iacute: '\u00ED', icirc: '\u00EE', iuml: '\u00EF',
+    eth: '\u00F0', ntilde: '\u00F1', ograve: '\u00F2', oacute: '\u00F3', ocirc: '\u00F4', otilde: '\u00F5', ouml: '\u00F6', divide: '\u00F7',
+    oslash: '\u00F8', ugrave: '\u00F9', uacute: '\u00FA', ucirc: '\u00FB', uuml: '\u00FC', yacute: '\u00FD', thorn: '\u00FE', yuml: '\u00FF',
+    OElig: '\u0152', oelig: '\u0153', Scaron: '\u0160', scaron: '\u0161', Yuml: '\u0178', fnof: '\u0192', circ: '\u02C6', tilde: '\u02DC',
+    ensp: '\u2002', emsp: '\u2003', thinsp: '\u2009', zwnj: '\u200C', zwj: '\u200D', lrm: '\u200E', rlm: '\u200F',
+    ndash: '\u2013', mdash: '\u2014', lsquo: '\u2018', rsquo: '\u2019', sbquo: '\u201A', ldquo: '\u201C', rdquo: '\u201D', bdquo: '\u201E',
+    dagger: '\u2020', Dagger: '\u2021', bull: '\u2022', hellip: '\u2026', permil: '\u2030', prime: '\u2032', Prime: '\u2033',
+    lsaquo: '\u2039', rsaquo: '\u203A', oline: '\u203E', frasl: '\u2044', euro: '\u20AC',
+    image: '\u2111', weierp: '\u2118', real: '\u211C', trade: '\u2122', alefsym: '\u2135',
+    larr: '\u2190', uarr: '\u2191', rarr: '\u2192', darr: '\u2193', harr: '\u2194', crarr: '\u21B5',
+    lArr: '\u21D0', uArr: '\u21D1', rArr: '\u21D2', dArr: '\u21D3', hArr: '\u21D4',
+    forall: '\u2200', part: '\u2202', exist: '\u2203', empty: '\u2205', nabla: '\u2207', isin: '\u2208', notin: '\u2209', ni: '\u220B',
+    prod: '\u220F', sum: '\u2211', minus: '\u2212', lowast: '\u2217', radic: '\u221A', prop: '\u221D', infin: '\u221E', ang: '\u2220',
+    and: '\u2227', or: '\u2228', cap: '\u2229', cup: '\u222A', int: '\u222B', there4: '\u2234', sim: '\u223C', cong: '\u2245',
+    asymp: '\u2248', ne: '\u2260', equiv: '\u2261', le: '\u2264', ge: '\u2265', sub: '\u2282', sup: '\u2283', nsub: '\u2284',
+    sube: '\u2286', supe: '\u2287', oplus: '\u2295', otimes: '\u2297', perp: '\u22A5', sdot: '\u22C5',
+    lceil: '\u2308', rceil: '\u2309', lfloor: '\u230A', rfloor: '\u230B', lang: '\u2329', rang: '\u232A',
+    loz: '\u25CA', spades: '\u2660', clubs: '\u2663', hearts: '\u2665', diams: '\u2666'
+  };
+  NAMED.AMP = '&';
+  NAMED.LT = '<';
+  NAMED.GT = '>';
+  NAMED.QUOT = '"';
+  NAMED.NBSP = '\u00A0';
+  NAMED.COPY = '\u00A9';
+  NAMED.REG = '\u00AE';
+
+  const NAMED_ESCAPE = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&apos;',
+    '\u00A0': '&nbsp;',
+    '\u00A9': '&copy;',
+    '\u00AE': '&reg;',
+    '\u2122': '&trade;',
+    '\u2014': '&mdash;',
+    '\u2013': '&ndash;',
+    '\u2026': '&hellip;',
+    '\u20AC': '&euro;',
+    '\u00A3': '&pound;',
+    '\u00A5': '&yen;',
+    '\u00B0': '&deg;',
+    '\u00D7': '&times;',
+    '\u00F7': '&divide;',
+    '\u2022': '&bull;',
+    '\u00AB': '&laquo;',
+    '\u00BB': '&raquo;',
+    '\u2018': '&lsquo;',
+    '\u2019': '&rsquo;',
+    '\u201C': '&ldquo;',
+    '\u201D': '&rdquo;'
+  };
+
+  function isValidCodePoint(cp) {
+    return Number.isInteger(cp) && cp >= 0 && cp <= 0x10FFFF && !(cp >= 0xD800 && cp <= 0xDFFF);
+  }
+
+  function escapeHtml(str) {
+    let result = '';
+    for (const ch of str) {
+      const named = NAMED_ESCAPE[ch];
+      if (named) {
+        result += named;
+        continue;
+      }
+      const cp = ch.codePointAt(0);
+      if (cp === 9 || cp === 10 || cp === 13 || (cp >= 0x20 && cp <= 0x7E)) result += ch;
+      else result += '&#' + cp + ';';
+    }
+    return result;
+  }
+
+  function unescapeHtml(str) {
+    return str.replace(/&(#[xX][0-9a-fA-F]+|#\d+|[A-Za-z][A-Za-z0-9]+);/g, (entity, body) => {
+      if (body.charAt(0) === '#') {
+        const hex = body.charAt(1) === 'x' || body.charAt(1) === 'X';
+        const cp = parseInt(body.slice(hex ? 2 : 1), hex ? 16 : 10);
+        if (!isValidCodePoint(cp)) throw new Error('invalid numeric character reference ' + entity);
+        return String.fromCodePoint(cp);
+      }
+      if (Object.prototype.hasOwnProperty.call(NAMED, body)) return NAMED[body];
+      return entity;
+    });
+  }
+
+  function show(text) {
+    err.textContent = '';
+    out.textContent = text;
+    out.dataset.ready = '1';
+  }
+
+  function resetOutput() {
+    out.textContent = '—';
+    delete out.dataset.ready;
+  }
+
+  document.getElementById('escape').onclick = () => {
+    try {
+      show(escapeHtml(input.value));
+    } catch (e) {
+      err.textContent = 'Could not escape: ' + (e && e.message ? e.message : String(e));
+      resetOutput();
+    }
+  };
+
+  document.getElementById('unescape').onclick = () => {
+    try {
+      show(unescapeHtml(input.value));
+    } catch (e) {
+      err.textContent = 'Invalid HTML entity: ' + (e && e.message ? e.message : String(e));
+      resetOutput();
+    }
+  };
+
+  function copyWithSelection(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  document.getElementById('copy').onclick = async () => {
+    if (out.dataset.ready !== '1') return;
+    const t = out.textContent;
+    err.textContent = '';
+    /* Selection copy runs inside the click so a denied or hanging Clipboard API cannot swallow the toast. */
+    if (copyWithSelection(t)) {
+      toast.textContent = 'Copied!';
+      setTimeout(() => { toast.textContent = ''; }, 4000);
+      return;
+    }
+    try {
+      if (!navigator.clipboard || !window.isSecureContext) throw new Error('Copy is not available in this browser');
+      await navigator.clipboard.writeText(t);
+      toast.textContent = 'Copied!';
+      setTimeout(() => { toast.textContent = ''; }, 4000);
+    } catch (e) {
+      err.textContent = 'Could not copy: ' + (e && e.message ? e.message : String(e));
+    }
+  };
+
+  document.getElementById('clear').onclick = () => {
+    input.value = '';
+    resetOutput();
+    err.textContent = '';
+    toast.textContent = '';
+  };
+  </script>
+</body>
+</html>
