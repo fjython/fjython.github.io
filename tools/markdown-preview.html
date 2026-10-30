@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Markdown to HTML Preview Online — Free Markdown Preview</title>
+  <meta name="description" content="Free markdown to html preview online. Paste Markdown and see a live HTML preview plus the generated HTML source. Supports headings, lists, links, code, and emphasis. Runs locally in your browser.">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"What Markdown features does this preview support?","acceptedAnswer":{"@type":"Answer","text":"A common subset: ATX headings (# through ######), bold and italic, inline code and fenced code blocks, links, unordered and ordered lists, blockquotes, horizontal rules, and paragraphs. Tables and raw HTML are not rendered as markup."}},
+    {"@type":"Question","name":"Is my Markdown uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. Parsing and preview run locally with JavaScript in your browser. Nothing is sent to a server."}},
+    {"@type":"Question","name":"Is the HTML output safe to paste into a page?","acceptedAnswer":{"@type":"Answer","text":"The converter escapes HTML special characters in your Markdown before applying formatting, so typed angle brackets become entities instead of live tags. Still review the HTML before using it in production."}}
+  ]}
+  </script>
+  <style>
+    .md-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 720px) { .md-layout { grid-template-columns: 1fr; } }
+    .md-preview {
+      min-height: 12rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      overflow: auto;
+      word-break: break-word;
+    }
+    .md-preview h1, .md-preview h2, .md-preview h3,
+    .md-preview h4, .md-preview h5, .md-preview h6 { margin: 0.75em 0 0.35em; line-height: 1.25; }
+    .md-preview h1 { font-size: 1.5rem; }
+    .md-preview h2 { font-size: 1.3rem; }
+    .md-preview h3 { font-size: 1.15rem; }
+    .md-preview p { margin: 0.5em 0; }
+    .md-preview ul, .md-preview ol { margin: 0.5em 0; padding-left: 1.4em; }
+    .md-preview blockquote {
+      margin: 0.5em 0;
+      padding: 0.25em 0.75em;
+      border-left: 3px solid var(--accent);
+      color: var(--muted);
+    }
+    .md-preview code {
+      font-family: var(--mono);
+      font-size: 0.9em;
+      background: var(--accent-soft);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+    }
+    .md-preview pre {
+      margin: 0.5em 0;
+      padding: 0.75rem;
+      background: #1a1d23;
+      color: #e8eaed;
+      border-radius: var(--radius);
+      overflow: auto;
+    }
+    .md-preview pre code { background: transparent; color: inherit; padding: 0; }
+    .md-preview a { word-break: break-all; }
+    .md-preview hr { border: none; border-top: 1px solid var(--border); margin: 1em 0; }
+    .md-html {
+      min-height: 6rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header"><div class="inner"><a class="logo" href="../index.html">Micro<span>Tools</span></a><a class="nav-home" href="../index.html">All tools</a></div></header>
+  <main>
+    <nav class="breadcrumb"><a href="../index.html">Home</a> / Markdown to HTML Preview</nav>
+    <h1>Markdown to HTML Preview</h1>
+    <p class="lead">Paste Markdown and get a live preview plus the generated HTML. Supports headings, lists, links, code, and emphasis. Everything runs in your browser.</p>
+    <div class="ad-slot" aria-hidden="true">Advertisement placeholder</div>
+    <div class="panel">
+      <label for="input">Markdown</label>
+      <textarea id="input" rows="10" spellcheck="false" placeholder="# Hello&#10;&#10;Write **Markdown** here…"></textarea>
+      <div class="row">
+        <button type="button" class="btn" id="preview">Preview</button>
+        <button type="button" class="btn-secondary btn" id="copy">Copy HTML</button>
+        <button type="button" class="btn-secondary btn" id="clear">Clear</button>
+        <span class="toast" id="toast"></span>
+      </div>
+      <p id="err" style="color:#dc2626;font-size:.9rem;min-height:1.2em;margin:.5rem 0 0"></p>
+      <div class="md-layout" style="margin-top:.75rem">
+        <div>
+          <label>Preview</label>
+          <div class="md-preview" id="previewBox" aria-live="polite"><p style="color:var(--muted);margin:0">—</p></div>
+        </div>
+        <div>
+          <label>HTML</label>
+          <div class="output-box md-html" id="out">—</div>
+        </div>
+      </div>
+    </div>
+    <section class="faq">
+      <h2>FAQ</h2>
+      <details open><summary>What Markdown features does this preview support?</summary><p>A common subset: ATX headings (# through ######), bold and italic, inline code and fenced code blocks, links, unordered and ordered lists, blockquotes, horizontal rules, and paragraphs. Tables and raw HTML are not rendered as markup.</p></details>
+      <details><summary>Is my Markdown uploaded to a server?</summary><p>No. Parsing and preview run locally with JavaScript in your browser. Nothing is sent to a server.</p></details>
+      <details><summary>Is the HTML output safe to paste into a page?</summary><p>The converter escapes HTML special characters in your Markdown before applying formatting, so typed angle brackets become entities instead of live tags. Still review the HTML before using it in production.</p></details>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="inner"><div class="ad-slot" aria-hidden="true">Footer ad placeholder</div><p>© <span class="y"></span> MicroTools</p></div></footer>
+  <script>
+  document.querySelectorAll('.y').forEach(el => el.textContent = new Date().getFullYear());
+  const input = document.getElementById('input');
+  const out = document.getElementById('out');
+  const previewBox = document.getElementById('previewBox');
+  const err = document.getElementById('err');
+  const toast = document.getElementById('toast');
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function inlineFormat(text) {
+    let s = escapeHtml(text);
+    const codes = [];
+    s = s.replace(/`([^`\n]+)`/g, (_, code) => {
+      const i = codes.length;
+      codes.push('<code>' + code + '</code>');
+      return '\u0000C' + i + '\u0000';
+    });
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, label, url) => {
+      const safeUrl = url.replace(/"/g, '');
+      return '<a href="' + safeUrl + '" rel="noopener noreferrer" target="_blank">' + label + '</a>';
+    });
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    s = s.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+    s = s.replace(/(^|[^_])_([^_\n]+)_/g, '$1<em>$2</em>');
+    s = s.replace(/\u0000C(\d+)\u0000/g, (_, i) => codes[+i]);
+    return s;
+  }
+
+  function mdToHtml(src) {
+    const lines = String(src).replace(/\r\n?/g, '\n').split('\n');
+    const html = [];
+    let i = 0;
+    let para = [];
+    let listType = null;
+    let listItems = [];
+
+    function flushPara() {
+      if (!para.length) return;
+      html.push('<p>' + inlineFormat(para.join(' ')) + '</p>');
+      para = [];
+    }
+    function flushList() {
+      if (!listType) return;
+      const tag = listType;
+      html.push('<' + tag + '>' + listItems.map(t => '<li>' + inlineFormat(t) + '</li>').join('') + '</' + tag + '>');
+      listType = null;
+      listItems = [];
+    }
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      if (/^```/.test(line)) {
+        flushPara();
+        flushList();
+        i++;
+        const codeLines = [];
+        while (i < lines.length && !/^```/.test(lines[i])) {
+          codeLines.push(lines[i]);
+          i++;
+        }
+        if (i < lines.length) i++;
+        html.push('<pre><code>' + escapeHtml(codeLines.join('\n')) + '</code></pre>');
+        continue;
+      }
+
+      if (/^\s*$/.test(line)) {
+        flushPara();
+        flushList();
+        i++;
+        continue;
+      }
+
+      if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+        flushPara();
+        flushList();
+        html.push('<hr>');
+        i++;
+        continue;
+      }
+
+      const heading = /^(#{1,6})\s+(.+)$/.exec(line);
+      if (heading) {
+        flushPara();
+        flushList();
+        const level = heading[1].length;
+        html.push('<h' + level + '>' + inlineFormat(heading[2].trim()) + '</h' + level + '>');
+        i++;
+        continue;
+      }
+
+      const bq = /^>\s?(.*)$/.exec(line);
+      if (bq) {
+        flushPara();
+        flushList();
+        const parts = [bq[1]];
+        i++;
+        while (i < lines.length) {
+          const m = /^>\s?(.*)$/.exec(lines[i]);
+          if (!m) break;
+          parts.push(m[1]);
+          i++;
+        }
+        html.push('<blockquote><p>' + inlineFormat(parts.join(' ')) + '</p></blockquote>');
+        continue;
+      }
+
+      const ul = /^[-*+]\s+(.+)$/.exec(line);
+      if (ul) {
+        flushPara();
+        if (listType && listType !== 'ul') flushList();
+        listType = 'ul';
+        listItems.push(ul[1]);
+        i++;
+        continue;
+      }
+
+      const ol = /^\d+\.\s+(.+)$/.exec(line);
+      if (ol) {
+        flushPara();
+        if (listType && listType !== 'ol') flushList();
+        listType = 'ol';
+        listItems.push(ol[1]);
+        i++;
+        continue;
+      }
+
+      flushList();
+      para.push(line.trim());
+      i++;
+    }
+    flushPara();
+    flushList();
+    return html.join('\n') || '<p></p>';
+  }
+
+  function render() {
+    err.textContent = '';
+    try {
+      const html = mdToHtml(input.value);
+      previewBox.innerHTML = html;
+      out.textContent = html;
+      out.dataset.ready = '1';
+    } catch (e) {
+      err.textContent = 'Could not render: ' + (e && e.message ? e.message : String(e));
+      previewBox.innerHTML = '<p style="color:var(--muted);margin:0">—</p>';
+      out.textContent = '—';
+      delete out.dataset.ready;
+    }
+  }
+
+  document.getElementById('preview').onclick = render;
+  input.addEventListener('input', () => {
+    if (out.dataset.ready === '1' || input.value.length) render();
+  });
+
+  function copyWithSelection(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  document.getElementById('copy').onclick = async () => {
+    if (out.dataset.ready !== '1') return;
+    const t = out.textContent;
+    err.textContent = '';
+    if (copyWithSelection(t)) {
+      toast.textContent = 'Copied!';
+      setTimeout(() => { toast.textContent = ''; }, 4000);
+      return;
+    }
+    try {
+      if (!navigator.clipboard || !window.isSecureContext) throw new Error('Copy is not available in this browser');
+      await navigator.clipboard.writeText(t);
+      toast.textContent = 'Copied!';
+      setTimeout(() => { toast.textContent = ''; }, 4000);
+    } catch (e) {
+      err.textContent = 'Could not copy: ' + (e && e.message ? e.message : String(e));
+    }
+  };
+
+  document.getElementById('clear').onclick = () => {
+    input.value = '';
+    previewBox.innerHTML = '<p style="color:var(--muted);margin:0">—</p>';
+    out.textContent = '—';
+    delete out.dataset.ready;
+    err.textContent = '';
+    toast.textContent = '';
+  };
+
+  input.value = '# Markdown preview\n\nType **bold**, *italic*, or `code`.\n\n- Lists work\n- So do [links](https://example.com)\n\n```\ncode blocks too\n```\n';
+  render();
+  </script>
+</body>
+</html>
